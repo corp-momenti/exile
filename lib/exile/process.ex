@@ -477,8 +477,6 @@ defmodule Exile.Process do
     end
   end
 
-  @spawner_path :filename.join(:code.priv_dir(:exile), "spawner")
-
   defp start_process(state) do
     %{args: %{cmd_with_args: cmd_with_args, cd: cd, env: env}, use_stderr: use_stderr} = state
 
@@ -495,7 +493,8 @@ defmodule Exile.Process do
         [:nouse_stdio, :exit_status, :binary, args: spawner_cmdline_args] ++
           prune_nils(env: env, cd: cd)
 
-      port = Port.open({:spawn_executable, @spawner_path}, port_opts)
+      spawner_path = :filename.join(:code.priv_dir(:exile), "spawner")
+      port = Port.open({:spawn_executable, spawner_path}, port_opts)
 
       {:os_pid, os_pid} = Port.info(port, :os_pid)
       Exile.Watcher.watch(self(), os_pid, socket_path)
